@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production App Check</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background-color: #f5f5f5; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: 20px auto; }
+        button { background-color: #007aff; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        .item-box { background: #f9f9f9; border: 1px solid #ddd; padding: 10px; margin-top: 10px; border-radius: 6px; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="card">
+        <h2>Production Database Test</h2>
+        <p>Press the button to request data across the internet from your live Aiven cloud server.</p>
+        
+        <button @click="fetchItems">Fetch Data Items</button>
+
+        <div v-if="loading" style="margin-top:15px;">Loading from cloud...</div>
+
+        <div v-for="item in arrayData" :key="item.id" class="item-box">
+            <strong style="color: #333;">{{ item.title }}</strong>
+            <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">{{ item.description }}</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    arrayData: [],
+                    loading: false,
+                    // 🛑 YOU WILL CHANGE THIS LINK ONCE YOU UPLOAD YOUR INDEX.PHP FILE
+                    apiUrl: 'http://localhost/mymobileproject/index.php/api/items'
+                }
+            },
+            methods: {
+                async fetchItems() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch(this.apiUrl);
+                        this.arrayData = await response.json();
+                    } catch (error) {
+                        alert("Error connecting to your backend: " + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+</html>
