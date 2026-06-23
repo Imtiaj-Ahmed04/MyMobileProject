@@ -37,8 +37,8 @@
                 return {
                     arrayData: [],
                     loading: false,
-                    // 🛑 YOU WILL CHANGE THIS LINK ONCE YOU UPLOAD YOUR INDEX.PHP FILE
-                    apiUrl: 'http://localhost/mymobileproject/index.php/api/items'
+                    // Fixed: Points directly to your Slim API route relatively
+                    apiUrl: '/api/items'
                 }
             },
             methods: {
