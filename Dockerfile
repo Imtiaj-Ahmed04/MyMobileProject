@@ -1,18 +1,22 @@
 FROM php:8.2-apache
 
-# Install the PDO MySQL driver extensions cleanly without composer
+# Install all necessary system tools and extensions
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip git \
     && docker-php-ext-install zip pdo pdo_mysql \
     && a2enmod rewrite
 
-# Set working directory
-WORKDIR /var/www/html
+# Install Composer cleanly
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy your whole repository straight into the container
+WORKDIR /var/www/html
 COPY . .
 
-# Force Apache to serve files directly out of your www subfolder where index.php lives
+# Force-create a composer setup right in the root if it's missing, then install Slim 4
+RUN composer init --name="app/mymobileproject" --require="slim/slim:4.*" --require="slim/psr7:1.*" -n \
+    && composer install --no-dev --optimize-autoloader
+
+# Point Apache straight to your www folder where index.php lives
 RUN sed -i 's|/var/www/html|/var/www/html/www|g' /etc/apache2/sites-available/000-default.conf
 
 RUN chown -R www-data:www-data /var/www/html
