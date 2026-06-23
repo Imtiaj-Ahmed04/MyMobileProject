@@ -12,12 +12,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-# Initialize composer in the root folder so vendor lands exactly at /var/www/html/vendor
+# Initialize composer right here in the root folder alongside index.php
 RUN composer init --name="app/mymobileproject" --require="slim/slim:4.*" --require="slim/psr7:1.*" -n \
     && composer install --no-dev --optimize-autoloader
 
-# Point Apache directly to your www folder
-RUN sed -i 's|/var/www/html|/var/www/html/www|g' /etc/apache2/sites-available/000-default.conf
+# Make sure Apache default root is clean and simple
+RUN sed -i 's|/var/www/html/www|/var/www/html|g' /etc/apache2/sites-available/000-default.conf
 
 RUN chown -R www-data:www-data /var/www/html
 EXPOSE 80
