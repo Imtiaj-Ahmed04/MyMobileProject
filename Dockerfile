@@ -12,16 +12,19 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Set working directory directly to your www subfolder
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy your whole repository over
 COPY . .
 
-# Install Composer dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Move into the www folder where composer.json actually lives and run install
+RUN cd www && composer install --no-dev --optimize-autoloader
 
-# Set permissions for Apache
+# Make Apache look directly inside the www folder for incoming traffic
+RUN sed -i 's|/var/www/html|/var/www/html/www|g' /etc/apache2/sites-available/000-default.conf
+
+# Set correct permissions
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
