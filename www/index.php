@@ -28,6 +28,20 @@ function getDB() {
     return $conn;
 }
 
+// ─── NEW FRONTEND ROUTE ───────────────────────────────────────────
+// This tells Slim to serve your index.html file at the main web URL
+$app->get('/', function (Request $request, Response $response) {
+    $htmlPath = __DIR__ . '/index.html';
+    if (file_exists($htmlPath)) {
+        $html = file_get_contents($htmlPath);
+        $response->getBody()->write($html);
+        return $response->withHeader('Content-Type', 'text/html')->withStatus(200);
+    }
+    $response->getBody()->write("Frontend index.html file not found inside www folder.");
+    return $response->withStatus(404);
+});
+// ──────────────────────────────────────────────────────────────────
+
 // GET Endpoint to fetch items from the live cloud
 $app->get('/api/items', function (Request $request, Response $response) {
     try {
